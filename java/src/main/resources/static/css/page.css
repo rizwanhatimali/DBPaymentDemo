@@ -1,0 +1,19 @@
+.btn-primary {
+	margin-top: 10px;
+}
+
+#payButton {
+	display :none;
+}
+
+#creditCardDetails {
+	display :none;
+}
+
+#submitButton {
+	display: none;
+}
+
+#error-alert {
+	margin-top: 1rem;
+}

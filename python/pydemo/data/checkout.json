@@ -1,0 +1,7 @@
+{
+    "paymentSessionDetails": {
+        "selectedPaymentMethod": "cardPayment",
+        "selectedPaymentInstrumentId": "NEW"
+    },
+    "merchantReference": "My Reference"
+}

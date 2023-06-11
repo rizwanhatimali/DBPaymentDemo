@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Checkout Page</title>
+
+    <!-- Bootstrap CSS -->
+    <link href="/css/bootstrap.min.css" rel="stylesheet">
+    <link href="/css/page.css" rel="stylesheet">
+</head>
+<body>
+<div class="container-fluid h-100 bg-light text-dark">
+    <div class="row justify-content-center align-items-center h-100">
+        <div class="col col-sm-6 col-md-6 col-lg-4 col-xl-3">
+            <form role="form">
+                <div>
+                    <label for="productId">Product Id</label>
+                    <input aria-label="Product" class="form-control" id="productId"
+                           type="text" value="Laptop-123"/>
+                </div>
+                <div>
+                    <label for="amount">Amount</label>
+                    <input aria-label="Amount" class="form-control" id="amount"
+                           type="text" value="500"/>
+                </div>
+
+                <div>
+                    <label for="currency">Currency</label>
+                    <input aria-label="Currency" class="form-control" id="currency"
+                           type="text" value="EUR"/>
+                </div>
+
+                <button class="btn btn-primary" id="checkoutButton" type="button">Checkout</button>
+
+                <div id="creditCardDetails">
+                    <div>
+                        <label for="paymentCardName">Name on card</label>
+                        <div class="form-control" id="paymentCardName"></div>
+                    </div>
+
+                    <div>
+                        <label for="paymentCardNumber">Payment card number</label>
+                        <div class="form-control" id="paymentCardNumber"></div>
+                    </div>
+
+                    <div>
+                        <label for="paymentCardExpiration">Expiration (mm/yyyy)</label>
+                        <div class="form-control" id="paymentCardExpiration"></div>
+                    </div>
+
+                    <div>
+                        <label for="paymentCardCVV">CVV (nnn)</label>
+                        <div class="form-control" id="paymentCardCVV"></div>
+                    </div>
+                </div>
+                <button class="btn btn-primary" id="payButton" type="button">Pay</button>
+
+            </form>
+            <input id="payment-session" type="hidden"/>
+        </div>
+    </div>
+
+    <div class="row justify-content-center align-items-center h-100">
+        <div class="col col-sm-9 col-md-9 col-lg-6 col-xl-5">
+            <div class="alert alert-danger alert-dismissible fade" id="error-alert" style="display: none">
+                <h4 class="alert-heading" id="error-alert-heading"></h4>
+                <p id="error-alert-body" class="overflow-auto"></p>
+                <a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="/js/lib/jquery-3.5.1.min.js"></script>
+<script src="/js/lib/bootstrap.min.js"></script>
+<script src="/js/lib/msrcrypto.min.js"></script>
+<script src="/js/error-handling.js"></script>
+<script src="/js/authorize-payment.js"></script>
+<script src="/js/creditcard.js"></script>
+<script src="/js/checkout.js"></script>
+
+</body>
+</html>

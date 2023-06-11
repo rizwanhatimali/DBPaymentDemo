@@ -1,0 +1,24 @@
+{
+    "amount": {
+        "amount": 200.00,
+        "currency": "EUR"
+    },
+    "buyerCountryCode": "DE",
+    "description": "Purchase description",
+    "distributions": [
+        {
+            "amount": {
+                "amount": 150.00,
+                "currency": "EUR"
+            },
+            "marketplaceCommission": {
+                "amount": 50,
+                "currency": "EUR"
+            },
+            "sellerId": "{{marketplaceSellerId}}"
+        }
+    ],
+    "externalPurchaseId": "{{newExternalPurchaseId}}",
+    "marketplaceId": "{{marketplaceId}}",
+    "purchaseType": "Regular"
+}

@@ -1,0 +1,23 @@
+spring:
+  application.name: demo-app
+  thymeleaf.cache: false
+
+server.port: 8083
+
+marketplacePurchase.url: https://sbx.corporateapi.db.com/services/digital/dpg/sbx/purchase/v1
+
+demo-app.tls-keystore-file: ../secret/dpg-demo-pack.dpg.db.com.p12
+demo-app.tls-keystore-pass: uYOEkClMUt8xZF/Zx8zwzd1y
+demo-app.cs-keystore-file: ../secret/dpg-demo-pack.dpg.db.com.p12
+demo-app.cs-keystore-pass: uYOEkClMUt8xZF/Zx8zwzd1y
+demo-app.public-key-id: dpg-demo-pack
+demo-app.header-date-name: Date
+demo-app.external-checkout-url: https://testmerch.directpos.de
+demo-app.credit-card-fragment: creditcard-sandbox
+demo-app.seller-id: AAEAAAc0ONmMn2-vnxrwYLMv
+demo-app.marketplace-id: AAEAAAc0ONmMmV_7SqGPDIQS
+demo-app.marketplace-api-key: QHKpnLwngS1RmvhFo5C8xmMTKx66YKaUDCn4aKxiCkHHqA26t2bit33N
+
+#Specify hostname of your proxy in the next line
+demo-app.proxy-host:
+demo-app.proxy-port: 8080

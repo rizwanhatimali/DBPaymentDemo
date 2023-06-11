@@ -1,0 +1,127 @@
+{% extends 'base.html' %}
+
+{% block header %}
+<h1>{% block title %}Pay with a card{% endblock %}</h1>
+<script type="text/javascript" src="https://testmerch.directpos.de/web-ifs/assets/1.1/integration.js"></script>
+<script type="text/javascript">
+  window.onload = function () {
+
+    const options = getOptions();
+    const preauthButton = document.querySelector("#preauthButton");
+    const cardCodeLabel = document.querySelector("#cardCodeLabel");
+
+    integration.initialize(options).then(function(ifsInstance) {
+      ifsInstance.on("submitRequest", preauth.call(this, ifsInstance));
+      preauthButton.addEventListener("click", preauth.call(this, ifsInstance), false);
+
+      ifsInstance.on("cardBrandChange", function (event) {
+        cardCodeLabel.innerHTML = event.fields.code.label
+          + " of your " + event.type + " card";
+      });
+
+      ifsInstance.on("formValidationChange", function (event) {
+        preauthButton.disabled = !event.valid;
+      });
+    });
+
+    preauthButton.disabled = true;
+  }
+
+  function getOptions() {
+    var options = {
+      clientSession: document.querySelector("#clientSession").value,
+      clientConfiguration: document.querySelector("#clientConfiguration").value,
+      type: "creditCard",
+      acs_window: {
+        width: 800,
+        height: 600
+      }
+    };
+    options.fields = {
+      holder: {
+        selector: "#cardName",
+        placeholder: "Cardholder Name",
+        required: false
+      },
+      number: {
+        selector: "#cardNumber",
+        placeholder: "0000 0000 0000 0000"
+      },
+      expiry: {
+        selector: "#cardExpiry",
+        placeholder: "MM/YY"
+      },
+      code: {
+        selector: "#cardCode",
+        placeholder: "nnn"
+      }
+    };
+    options.styles = {
+      "input": {
+        "font-size": "16px",
+        "color": "#444444",
+        "font-family": "monospace"
+      },
+      ".ifs-valid": {
+        "color": "Green"
+      },
+      ".ifs-invalid": {
+        "color": "Crimson"
+      },
+      ".ifs-not-accepted": {
+        "color": "DarkGoldenrod"
+      }
+    };
+    console.log("Options: " + JSON.stringify(options));
+    return options;
+  }
+
+  function preauth(ifsInstance) {
+    return event => {
+      if (event instanceof Event) event.preventDefault();
+      if (!ifsInstance.isActive() || !ifsInstance.isValid()) return;
+
+      ifsInstance.createToken(function (createTokenErr, createTokenResponse) {
+        if (createTokenErr) {
+          console.error("Failed to create token: " + createTokenErr);
+          return;
+        }
+        console.log("createTokenResponse: " + JSON.stringify(createTokenResponse));
+        document.querySelector("#cardToken").value = createTokenResponse.token;
+        document.querySelector("#preauthForm").submit();
+      });
+    };
+  }
+</script>
+{% endblock %}
+
+{% block content %}
+<form method="post" id="preauthForm">
+  <div>
+    <label for="cardName">Name on card</label>
+    <div id="cardName" name="cardName" class="card"></div>
+  </div>
+  <div>
+    <label for="cardNumber">Card number</label>
+    <div id="cardNumber" name="cardNumber" class="card"></div>
+  </div>
+  <div>
+    <label for="cardExpiry">Card expires</label>
+    <div id="cardExpiry" name="cardExpiry" class="card"></div>
+  </div>
+  <div>
+    <label for="cardCode" id="cardCodeLabel">CVV / CVC</label>
+    <div id="cardCode" name="cardCode" class="card"></div>
+  </div>
+  <div>
+    <input type="checkbox" name="capture" id="capture" checked />
+    <label for="capture">Capture immediately after preauthorization</label>
+  </div>
+  <input type="hidden" id="cardToken" name="cardToken" value="" />
+  <input type="hidden" id="clientSession" name="clientSession"
+    value="{{session['requestParameters']['clientSession']}}" />
+  <input type="hidden" id="clientConfiguration" name="clientConfiguration"
+    value="{{session['requestParameters']['clientConfiguration']}}" />
+  <input type="submit" id="preauthButton" value="Finish" />
+</form>
+{% endblock %}

@@ -1,0 +1,14 @@
+html { font-family: Verdana, Geneva, Tahoma, sans-serif; background: lightgrey; padding: 1rem; }
+body { max-width: 1024px; margin: 0 auto; background: white; }
+h1 { color: darkblue; flex: auto; margin: 1rem 0; }
+img {height: 1em; align-self: flex-end;}
+nav { background: darkblue; padding: 0.5rem 0.5rem; }
+nav h1 { margin: 0; color: white; }
+input[type=submit] { align-self: flex-end; min-width: 10rem; }
+label { font-size: smaller; }
+.content { padding: 0 1rem 1rem; }
+.content form { margin: 1rem 0; display: flex; flex-direction: column; }
+.success { margin: 1rem 0; padding: 0.25rem 0.5rem; background: honeydew; border: 1px solid lightgreen; white-space: pre; font-size: smaller; }
+.failure { margin: 1rem 0; padding: 0.25rem 0.5rem; background: lavenderblush; border: 1px solid pink; ; white-space: pre; font-size: smaller; }
+.info { margin: 1rem 0; padding: 0.25rem 0.5rem; background: aliceblue; border: 1px solid lightskyblue; white-space: pre; font-family: 'Courier New', Courier, monospace; font-size: small; }
+.card { padding: 0.25rem 0.5rem; height: 1.25rem; border-style: solid; border-color: lightgray; border-width: 1px; }

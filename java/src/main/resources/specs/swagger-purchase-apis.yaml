@@ -1,0 +1,1510 @@
+---
+swagger: "2.0"
+info:
+  description: |
+    Welcome to DigitalPaymentGateway.
+
+    The DigitalPaymentGateway APIs are HTTP-based RESTful APIs that use tokenized authentication.  
+
+    API request and response bodies are formatted in JSON.
+  version: "1.5-draft"
+  title: "DigitalPaymentGateway API"
+host: "<hostname>"
+basePath: "/dpg/v1/v1/dpg"
+tags:
+  - name: "marketplace-purchase"
+    description: "marketplace-purchase"
+produces:
+  - "application/json"
+paths:
+  /marketplace/purchases:
+    get:
+      tags:
+        - "marketplace-purchase"
+      summary: "List marketplace purchases"
+      description: "List purchases within the marketplace."
+      operationId: "getMarketplacePurchases"
+      parameters:
+        - name: "count"
+          in: "query"
+          description: "The maximum number of purchases to provide in a single page of a response"
+          required: false
+          type: "integer"
+          default: 20
+          format: "int32"
+          allowEmptyValue: false
+        - name: "fromDate"
+          in: "query"
+          description: "e.g.: 2021-01-12T00:00:00Z"
+          required: false
+          type: "string"
+        - name: "marketplaceId"
+          in: "query"
+          description: "Only MarketplacePurchaseInfo for this Marketplace Id are returned"
+          required: false
+          type: "string"
+        - name: "purchaseStatus"
+          in: "query"
+          description: |
+            * `Created`
+            * `ConfirmInProgress`
+            * `PreauthorizeInProgress`
+            * `Confirmed`
+            * `Cancelled`
+            * `Completed`
+          required: false
+          type: "string"
+        - name: "purchaseType"
+          in: "query"
+          description: "Regular, SettlementOnly"
+          required: false
+          type: "string"
+        - name: "sorting"
+          in: "query"
+          description: |
+            id, marketplaceId, externalPurchaseId, creationDatetime,
+            purchaseStatus, amountCurrency, amountAmount, reconciliationStatus;
+            natural order ascending or descending
+          required: false
+          type: "string"
+          allowEmptyValue: false
+        - name: "startWith"
+          in: "query"
+          description: "startWith"
+          required: false
+          type: "integer"
+          default: 0
+          format: "int32"
+        - name: "untilDate"
+          in: "query"
+          description: "e.g.: 2021-01-12T00:00:00Z"
+          required: false
+          type: "string"
+      responses:
+        "200":
+          description: "OK"
+          schema:
+            $ref: "#/definitions/ApiResponseListOfMarketplacePurchaseInfo"
+        "400":
+          description: "Invalid Input"
+        "401":
+          description: "Unauthorized"
+      deprecated: false
+    post:
+      tags:
+        - "marketplace-purchase"
+      summary: "Create a new marketplace purchase"
+      description: |
+        Creates a new marketplace purchase.
+
+        The response contains the details of the created marketplace purchase.
+
+        The `data.id` is used to further identify this marketplace purchase.
+      operationId: "createMarketplacePurchase"
+      consumes:
+        - "application/json"
+      parameters:
+        - in: "body"
+          name: "request"
+          description: "request"
+          required: true
+          schema:
+            $ref: "#/definitions/CreateMarketplacePurchaseRequest"
+      responses:
+        "201":
+          description: "Created"
+          schema:
+            $ref: "#/definitions/ApiResponseOfMarketplacePurchaseInfo"
+        "400":
+          description: "Invalid Input"
+        "401":
+          description: "Unauthorized"
+      deprecated: false
+  /marketplace/purchases/ext/{externalPurchaseId}:
+    get:
+      tags:
+        - "marketplace-purchase"
+      summary: "Get a marketplace purchase by externalPurchaseId"
+      description: "Get a marketplace purchase by its External Purchase Id"
+      operationId: "getMarketplacePurchaseByExternalPurchaseId"
+      parameters:
+        - name: "externalPurchaseId"
+          in: "path"
+          description: "Only MarketplacePurchase for the Marketplace Purchase Id with this External Purchase ID is updated and returned"
+          required: true
+          type: "string"
+          minLength: 1
+          maxLength: 64
+      responses:
+        "200":
+          description: "OK"
+          schema:
+            $ref: "#/definitions/ApiResponseOfMarketplacePurchaseInfo"
+        "400":
+          description: "Invalid Input"
+        "401":
+          description: "Unauthorized"
+        "404":
+          description: "Not Found"
+      deprecated: false
+    put:
+      tags:
+        - "marketplace-purchase"
+      summary: "Update a marketplace purchase with given externalPurchaseId"
+      description: "Updates the marketplace purchase with the given External Purchase ID."
+      operationId: "updateMarketplacePurchaseByExternalPurchaseId"
+      consumes:
+        - "application/json"
+      parameters:
+        - name: "externalPurchaseId"
+          in: "path"
+          description: "Only MarketplacePurchase for the Marketplace Purchase Id with this External Purchase ID is updated and returned"
+          required: true
+          type: "string"
+          minLength: 1
+          maxLength: 64
+        - in: "body"
+          name: "request"
+          description: "request"
+          required: true
+          schema:
+            $ref: "#/definitions/UpdateMarketplacePurchaseRequest"
+      responses:
+        "200":
+          description: "OK"
+          schema:
+            $ref: "#/definitions/ApiResponseOfMarketplacePurchaseInfo"
+        "400":
+          description: "Invalid Input"
+        "401":
+          description: "Unauthorized"
+        "404":
+          description: "Not Found"
+      deprecated: false
+  /marketplace/purchases/ext/{externalPurchaseId}/payment-options:
+    get:
+      tags:
+        - "marketplace-purchase"
+      summary: "Retrieve PaymentOptions for a purchase with externalPurchaseId"
+      description: |
+        This call is used to determine the payment amount and the
+        available means of payment for the buyer in the context of the given
+        External Purchase ID.
+      operationId: "getMarketplacePaymentOptionsByExternalPurchaseId"
+      parameters:
+        - name: "externalPurchaseId"
+          in: "path"
+          description: "Only PaymentOptions for MarketplacePurchase with the given External Purchase Id is returned"
+          required: true
+          type: "string"
+          minLength: 1
+          maxLength: 64
+      responses:
+        "200":
+          description: "OK"
+          schema:
+            $ref: "#/definitions/ApiResponseOfPaymentOptionsInfo"
+        "400":
+          description: "Invalid Input"
+        "401":
+          description: "Unauthorized"
+        "404":
+          description: "Not Found"
+      deprecated: false
+  /marketplace/purchases/ext/{externalPurchaseId}:cancel:
+    post:
+      tags:
+        - "marketplace-purchase"
+      summary: "Cancel marketplace purchase with externalPurchaseId"
+      description: "Cancel marketplace purchase."
+      operationId: "cancelMarketplacePurchaseByExternalPurchaseId"
+      consumes:
+        - "application/json"
+      parameters:
+        - in: "body"
+          name: "cancelMarketplacePurchaseRequest"
+          description: "cancelMarketplacePurchaseRequest"
+          required: true
+          schema:
+            $ref: "#/definitions/CancelMarketplacePurchaseRequest"
+        - name: "externalPurchaseId"
+          in: "path"
+          description: "Only Payment for MarketplacePurchase with the given External Marketplace Purchase Id is cancelled"
+          required: true
+          type: "string"
+          minLength: 1
+          maxLength: 64
+      responses:
+        "200":
+          description: "OK"
+          schema:
+            $ref: "#/definitions/ApiResponseOfMarketplacePurchaseInfo"
+        "400":
+          description: "Invalid Input"
+        "401":
+          description: "Unauthorized"
+      deprecated: false
+  /marketplace/purchases/ext/{externalPurchaseId}:capture:
+    post:
+      tags:
+        - "marketplace-purchase"
+      summary: "Capture the purchase with externalPurchaseId"
+      description: |
+        Calling capture is valid for purchases with
+        paymentMethod:cardPayment and with the purchase status of Confirmed
+      operationId: "captureMarketplacePurchaseByExternalPurchaseId"
+      consumes:
+        - "application/json"
+      parameters:
+        - name: "externalPurchaseId"
+          in: "path"
+          description: "Only MarketplacePayment for MarketplacePurchase with the given External Purchase Id is captured"
+          required: true
+          type: "string"
+          minLength: 1
+          maxLength: 64
+      responses:
+        "200":
+          description: "OK"
+          schema:
+            $ref: "#/definitions/ApiResponseOfMarketplacePaymentInfo"
+        "400":
+          description: "Invalid Input"
+        "401":
+          description: "Unauthorized"
+      deprecated: false
+  /marketplace/purchases/ext/{externalPurchaseId}:checkout:
+    post:
+      tags:
+        - "marketplace-purchase"
+      summary: "Start checkout of marketplace purchase with externalPurchaseId"
+      description: "Purchase must have the status of Created"
+      operationId: "checkoutMarketplacePurchaseByExternalPurchaseId"
+      consumes:
+        - "application/json"
+      parameters:
+        - name: "externalPurchaseId"
+          in: "path"
+          description: "Only MarketplacePurchase with the given External Purchase Id is checked out"
+          required: true
+          type: "string"
+          minLength: 1
+          maxLength: 64
+        - in: "body"
+          name: "request"
+          description: |
+            In `paymentSessionDetails` provide either
+            * `CardPaymentDetails`
+            or
+            * `BankTransferDetails`
+          required: true
+          schema:
+            $ref: "#/definitions/CheckoutMarketplacePurchaseRequest"
+      responses:
+        "200":
+          description: "OK"
+          schema:
+            $ref: "#/definitions/ApiResponseOfMarketplacePurchaseCheckoutInfo"
+        "400":
+          description: "Invalid Input"
+        "401":
+          description: "Unauthorized"
+      deprecated: false
+  /marketplace/purchases/ext/{externalPurchaseId}:confirmPayment:
+    post:
+      tags:
+        - "marketplace-purchase"
+      summary: "Complete marketplace purchase with the given externalPurchaseId"
+      description: "Complete marketplace purchase"
+      operationId: "confirmMarketplacePaymentByExternalPurchaseId"
+      consumes:
+        - "application/json"
+      parameters:
+        - name: "externalPurchaseId"
+          in: "path"
+          description: "Only Payment for MarketplacePurchase with the given External Purchase Id is completed"
+          required: true
+          type: "string"
+          minLength: 1
+          maxLength: 64
+        - in: "body"
+          name: "request"
+          description: "request"
+          required: false
+          schema:
+            $ref: "#/definitions/CompleteMarketplacePurchaseRequest"
+      responses:
+        "200":
+          description: "OK"
+          schema:
+            $ref: "#/definitions/ApiResponseOfMarketplacePurchaseInfo"
+        "400":
+          description: "Invalid Input"
+        "401":
+          description: "Unauthorized"
+      deprecated: false
+  /marketplace/purchases/ext/{externalPurchaseId}:preauthorize:
+    post:
+      tags:
+        - "marketplace-purchase"
+      summary: "Preauthorize the purchase with externalPurchaseId"
+      description: |
+        Calling preauthorize is valid for purchases with
+        paymentMethod:cardPayment and with the purchase status of ConfirmInProgress
+      operationId: "preauthorizeMarketplacePurchaseByExternalPurchaseId"
+      consumes:
+        - "application/json"
+      parameters:
+        - name: "externalPurchaseId"
+          in: "path"
+          description: "Only MarketplacePurchase with the given External Purchase Id is preauthorized"
+          required: true
+          type: "string"
+          minLength: 1
+          maxLength: 64
+        - in: "body"
+          name: "request"
+          description: |
+            In `paymentSessionDetails` provide either
+            * `CardPaymentDetails`
+            or
+            * `BankTransferDetails`
+          required: true
+          schema:
+            $ref: "#/definitions/PreauthorizeMarketplacePurchaseRequest"
+      responses:
+        "200":
+          description: "OK"
+          schema:
+            $ref: "#/definitions/ApiResponseOfMarketplacePaymentInfo"
+        "400":
+          description: "Invalid Input"
+        "401":
+          description: "Unauthorized"
+      deprecated: false
+  /marketplace/purchases/ext/{externalPurchaseId}:refund:
+    post:
+      tags:
+        - "marketplace-purchase"
+      summary: "Refund the purchase with externalPurchaseId"
+      description: |
+        Purchase status must be Completed with a reconciliationStatus 
+        of Success
+      operationId: "refundMarketplacePurchaseByExternalPurchaseId"
+      consumes:
+        - "application/json"
+      parameters:
+        - name: "externalPurchaseId"
+          in: "path"
+          description: "Only MarketplacePayment for MarketplacePurchase with the given External Purchase Id is refunded"
+          required: true
+          type: "string"
+          minLength: 1
+          maxLength: 64
+        - in: "body"
+          name: "request"
+          description: "request"
+          required: true
+          schema:
+            $ref: "#/definitions/RefundMarketplacePurchaseRequest"
+      responses:
+        "201":
+          description: "Created"
+          schema:
+            $ref: "#/definitions/ApiResponseOfMarketplacePaymentInfo"
+        "400":
+          description: "Invalid Input"
+        "401":
+          description: "Unauthorized"
+      deprecated: false
+  /marketplace/purchases/{marketplacePurchaseId}:
+    get:
+      tags:
+        - "marketplace-purchase"
+      summary: "Get a marketplace purchase by marketplacePurchaseId"
+      description: "Get a marketplace purchase by its marketplacePurchaseId"
+      operationId: "getMarketplacePurchaseByMarketplacePurchaseId"
+      parameters:
+        - name: "marketplacePurchaseId"
+          in: "path"
+          description: "Only MarketplacePurchaseInfo for the given Marketplace Purchase Id is returned"
+          required: true
+          type: "string"
+          minLength: 1
+          maxLength: 24
+      responses:
+        "200":
+          description: "OK"
+          schema:
+            $ref: "#/definitions/ApiResponseOfMarketplacePurchaseInfo"
+        "400":
+          description: "Invalid Input"
+        "401":
+          description: "Unauthorized"
+        "404":
+          description: "Not Found"
+      deprecated: false
+    put:
+      tags:
+        - "marketplace-purchase"
+      summary: "Update a marketplace purchase with given marketplacePurchaseId"
+      description: |
+        Can be called when the purchase has the status...
+         * `Created`
+         * `CheckoutInProgress` if Card Payment. Not if Bank Transfer
+         * `ConfirmInProgress` if Card Payment. Not if Bank Transfer
+
+
+        Not if it has the status...
+         * `PreauthorizeInProgress`
+         * `Confirmed`
+         * `Cancelled`
+         * `Completed`
+      operationId: "updateMarketplacePurchaseByMarketplacePurchaseId"
+      consumes:
+        - "application/json"
+      parameters:
+        - name: "marketplacePurchaseId"
+          in: "path"
+          description: "Only MarketplacePurchase for this Marketplace Purchase Id are updated and returned"
+          required: true
+          type: "string"
+          minLength: 1
+          maxLength: 24
+        - in: "body"
+          name: "request"
+          description: "request"
+          required: true
+          schema:
+            $ref: "#/definitions/UpdateMarketplacePurchaseRequest"
+      responses:
+        "200":
+          description: "OK"
+          schema:
+            $ref: "#/definitions/ApiResponseOfMarketplacePurchaseInfo"
+        "400":
+          description: "Invalid Input"
+        "401":
+          description: "Unauthorized"
+        "404":
+          description: "Not Found"
+      deprecated: false
+  /marketplace/purchases/{marketplacePurchaseId}/payment-options:
+    get:
+      tags:
+        - "marketplace-purchase"
+      summary: "Retrieve PaymentOptions for a purchase with marketplacePurchaseId"
+      description: |
+        This call is used to determine the payment amount and the
+        available means of payment for the buyer in the context of the given
+        Marketplace Purchase ID.
+      operationId: "getMarketplacePaymentOptionsByMarketplacePurchaseId"
+      parameters:
+        - name: "marketplacePurchaseId"
+          in: "path"
+          description: "Only PaymentOptions for MarketplacePurchase with the given Marketplace Purchase Id is returned"
+          required: true
+          type: "string"
+          minLength: 1
+          maxLength: 24
+      responses:
+        "200":
+          description: "OK"
+          schema:
+            $ref: "#/definitions/ApiResponseOfPaymentOptionsInfo"
+        "400":
+          description: "Invalid Input"
+        "401":
+          description: "Unauthorized"
+        "404":
+          description: "Not Found"
+      deprecated: false
+  /marketplace/purchases/{marketplacePurchaseId}:cancel:
+    post:
+      tags:
+        - "marketplace-purchase"
+      summary: "Cancel marketplace purchase with marketplacePurchaseId"
+      description: "Purchase must be in the status of Created"
+      operationId: "cancelMarketplacePurchaseByMarketplacePurchaseId"
+      consumes:
+        - "application/json"
+      parameters:
+        - in: "body"
+          name: "cancelMarketplacePurchaseRequest"
+          description: "cancelMarketplacePurchaseRequest"
+          required: true
+          schema:
+            $ref: "#/definitions/CancelMarketplacePurchaseRequest"
+        - name: "marketplacePurchaseId"
+          in: "path"
+          description: "Only Payment for MarketplacePurchase with the given Marketplace Purchase Id is cancelled"
+          required: true
+          type: "string"
+          minLength: 1
+          maxLength: 24
+      responses:
+        "200":
+          description: "OK"
+          schema:
+            $ref: "#/definitions/ApiResponseOfMarketplacePurchaseInfo"
+        "400":
+          description: "Invalid Input"
+        "401":
+          description: "Unauthorized"
+      deprecated: false
+  /marketplace/purchases/{marketplacePurchaseId}:capture:
+    post:
+      tags:
+        - "marketplace-purchase"
+      summary: "Capture the purchase with marketplacePurchaseId"
+      description: |
+        Calling capture is valid for purchases with
+        paymentMethod:cardPayment and with the purchase status of Confirmed
+      operationId: "captureMarketplacePurchaseByMarketplacePurchaseId"
+      consumes:
+        - "application/json"
+      parameters:
+        - name: "marketplacePurchaseId"
+          in: "path"
+          description: "Only MarketplacePurchase with the given Marketplace Purchase Id is captured"
+          required: true
+          type: "string"
+          minLength: 1
+          maxLength: 24
+      responses:
+        "200":
+          description: "OK"
+          schema:
+            $ref: "#/definitions/ApiResponseOfMarketplacePaymentInfo"
+        "400":
+          description: "Invalid Input"
+        "401":
+          description: "Unauthorized"
+      deprecated: false
+  /marketplace/purchases/{marketplacePurchaseId}:checkout:
+    post:
+      tags:
+        - "marketplace-purchase"
+      summary: "Start checkout of marketplace purchase with marketplacePurchaseId"
+      description: "Purchase must have the status of Created"
+      operationId: "checkoutMarketplacePurchaseByMarketplacePurchaseId"
+      consumes:
+        - "application/json"
+      parameters:
+        - name: "marketplacePurchaseId"
+          in: "path"
+          description: "Only MarketplacePurchase with the given Marketplace Purchase Id is checked out"
+          required: true
+          type: "string"
+          minLength: 1
+          maxLength: 24
+        - in: "body"
+          name: "request"
+          description: |
+            In `paymentSessionDetails` provide either
+            * `CardPaymentDetails`
+            or
+            * `BankTransferDetails`
+          required: true
+          schema:
+            $ref: "#/definitions/CheckoutMarketplacePurchaseRequest"
+      responses:
+        "200":
+          description: "OK"
+          schema:
+            $ref: "#/definitions/ApiResponseOfMarketplacePurchaseCheckoutInfo"
+        "400":
+          description: "Invalid Input"
+        "401":
+          description: "Unauthorized"
+      deprecated: false
+  /marketplace/purchases/{marketplacePurchaseId}:confirmPayment:
+    post:
+      tags:
+        - "marketplace-purchase"
+      summary: "Complete marketplace purchase with given marketplacePurchaseId"
+      description: "Complete marketplace purchase the given marketplacePurchaseId"
+      operationId: "confirmMarketplacePaymentByMarketplacePurchaseId"
+      consumes:
+        - "application/json"
+      parameters:
+        - name: "marketplacePurchaseId"
+          in: "path"
+          description: "Only Payment for MarketplacePurchase with the given Marketplace Purchase Id is completed"
+          required: true
+          type: "string"
+          minLength: 1
+          maxLength: 24
+        - in: "body"
+          name: "request"
+          description: "request"
+          required: false
+          schema:
+            $ref: "#/definitions/CompleteMarketplacePurchaseRequest"
+      responses:
+        "200":
+          description: "OK"
+          schema:
+            $ref: "#/definitions/ApiResponseOfMarketplacePurchaseInfo"
+        "400":
+          description: "Invalid Input"
+        "401":
+          description: "Unauthorized"
+      deprecated: false
+  /marketplace/purchases/{marketplacePurchaseId}:preauthorize:
+    post:
+      tags:
+        - "marketplace-purchase"
+      summary: "Preauthorize the purchase with marketplacePurchaseId"
+      description: |
+        Calling preauthorize is valid for purchases with 
+        paymentMethod:cardPayment and with a purchase status of ConfirmInProgress
+      operationId: "preauthorizeMarketplacePurchaseByMarketplacePurchaseId"
+      consumes:
+        - "application/json"
+      parameters:
+        - name: "marketplacePurchaseId"
+          in: "path"
+          description: "Only MarketplacePayment for MarketplacePurchase with the given Marketplace Purchase Id is pre-authorized"
+          required: true
+          type: "string"
+          minLength: 1
+          maxLength: 24
+        - in: "body"
+          name: "request"
+          description: |
+            In `paymentSessionDetails` provide either
+            * `CardPaymentDetails`
+            or
+            * `BankTransferDetails`
+          required: true
+          schema:
+            $ref: "#/definitions/PreauthorizeMarketplacePurchaseRequest"
+      responses:
+        "200":
+          description: "OK"
+          schema:
+            $ref: "#/definitions/ApiResponseOfMarketplacePaymentInfo"
+        "400":
+          description: "Invalid Input"
+        "401":
+          description: "Unauthorized"
+      deprecated: false
+  /marketplace/purchases/{marketplacePurchaseId}:refund:
+    post:
+      tags:
+        - "marketplace-purchase"
+      summary: "Refund the purchase with marketplacePurchaseId"
+      description: |
+        Purchase status must be Completed with a reconciliationStatus 
+        of Success
+      operationId: "refundMarketplacePurchaseByMarketplacePurchaseId"
+      consumes:
+        - "application/json"
+      parameters:
+        - name: "marketplacePurchaseId"
+          in: "path"
+          description: "Only MarketplacePayment for MarketplacePurchase with the given Marketplace Purchase Id is refunded"
+          required: true
+          type: "string"
+          minLength: 1
+          maxLength: 24
+        - in: "body"
+          name: "request"
+          description: "request"
+          required: true
+          schema:
+            $ref: "#/definitions/RefundMarketplacePurchaseRequest"
+      responses:
+        "201":
+          description: "Created"
+          schema:
+            $ref: "#/definitions/ApiResponseOfMarketplacePaymentInfo"
+        "400":
+          description: "Invalid Input"
+        "401":
+          description: "Unauthorized"
+      deprecated: false
+definitions:
+  ApiErrorDetails:
+    type: "object"
+    properties:
+      code:
+        type: "integer"
+        format: "int32"
+      error:
+        type: "string"
+      errors:
+        type: "array"
+        items:
+          $ref: "#/definitions/ErrorDetails"
+      field:
+        type: "string"
+      message:
+        type: "string"
+    title: "ApiErrorDetails"
+  ApiResponseListOfMarketplacePurchaseInfo:
+    type: "object"
+    description: "`data` and `error` are mutually exclusive."
+    properties:
+      apiVersion:
+        type: "string"
+      data:
+        type: "array"
+        items:
+          $ref: "#/definitions/MarketplacePurchaseInfo"
+      error:
+        $ref: "#/definitions/ApiErrorDetails"
+      meta:
+        $ref: "#/definitions/PagingResponse"
+    title: "ApiResponseListOfMarketplacePurchaseInfo"
+  ApiResponseOfMarketplacePaymentInfo:
+    type: "object"
+    description: "`data` and `error` are mutually exclusive."
+    properties:
+      apiVersion:
+        type: "string"
+      data:
+        $ref: "#/definitions/MarketplacePaymentInfo"
+      error:
+        $ref: "#/definitions/ApiErrorDetails"
+    title: "ApiResponseOfMarketplacePaymentInfo"
+  ApiResponseOfMarketplacePurchaseCheckoutInfo:
+    type: "object"
+    description: "`data` and `error` are mutually exclusive."
+    properties:
+      apiVersion:
+        type: "string"
+      data:
+        $ref: "#/definitions/MarketplacePurchaseCheckoutInfo"
+      error:
+        $ref: "#/definitions/ApiErrorDetails"
+    title: "ApiResponseOfMarketplacePurchaseCheckoutInfo"
+  ApiResponseOfMarketplacePurchaseInfo:
+    type: "object"
+    description: "`data` and `error` are mutually exclusive."
+    properties:
+      apiVersion:
+        type: "string"
+      data:
+        $ref: "#/definitions/MarketplacePurchaseInfo"
+      error:
+        $ref: "#/definitions/ApiErrorDetails"
+    title: "ApiResponseOfMarketplacePurchaseInfo"
+  ApiResponseOfPaymentOptionsInfo:
+    type: "object"
+    description: "`data` and `error` are mutually exclusive."
+    properties:
+      apiVersion:
+        type: "string"
+      data:
+        $ref: "#/definitions/PaymentOptionsInfo"
+      error:
+        $ref: "#/definitions/ApiErrorDetails"
+    title: "ApiResponseOfPaymentOptionsInfo"
+  BankTransferDetails:
+    title: "BankTransferDetails"
+    allOf:
+      - $ref: "#/definitions/PaymentSessionDetails"
+      - type: "object"
+        required:
+          - "additionalData"
+          - "selectedPaymentMethod"
+          - "selectedPaymentInstrumentId"
+        discriminator: "selectedPaymentMethod"
+        properties:
+          additionalData:
+            type: "string"
+            description: "The payment reference to use for the bank transfer"
+          countryCode:
+            type: "string"
+            description: "The country code of the buyer"
+            minLength: 2
+            maxLength: 2
+        title: "BankTransferDetails"
+        description: |
+          Provide discriminator in mandatory field `selectedPaymentMethod` of
+           values `bankTransfer` or `cardPayment` as a string
+    description: |
+      Provide discriminator in mandatory field `selectedPaymentMethod` of
+        values `bankTransfer` or `cardPayment` as a string
+  CancelMarketplacePurchaseRequest:
+    type: "object"
+    required:
+      - "cancellationReason"
+    properties:
+      cancellationReason:
+        description: "Reason for cancelling MarketplacePurchase"
+        type: "string"
+        minLength: 1
+        maxLength: 200
+    title: "CancelMarketplacePurchaseRequest"
+  CheckoutMarketplacePurchaseRequest:
+    type: "object"
+    required:
+      - "paymentSessionDetails"
+    properties:
+      paymentSessionDetails:
+        $ref: "#/definitions/PaymentSessionDetails"
+      merchantReference:
+        type: "string"
+        description: "This reference will appear on the consumer’s card statement"
+        minLength: 1
+        maxLength: 30
+    example:
+      paymentSessionDetails (as BankTransferDetails):
+        selectedPaymentMethod: "bankTransfer"
+        selectedPaymentInstrumentId: "NEW"
+        additionalData: "PAYREF123O"
+        countryCode: "DE"
+      paymentSessionDetails (as CardPaymentDetails):
+        selectedPaymentMethod: "cardPayment"
+        selectedPaymentInstrumentId: "NEW"
+      merchantReference: "1234"
+    title: "CheckoutMarketplacePurchaseRequest"
+  CompleteMarketplacePurchaseRequest:
+    type: "object"
+    properties:
+      amount:
+        description: "Total money amount of this Purchase"
+        $ref: "#/definitions/Money"
+      distributions:
+        type: "array"
+        description: "Distribution of money amount between sellers"
+        items:
+          $ref: "#/definitions/CreateMarketplacePurchaseDistributionRequest"
+      paymentReferences:
+        type: "array"
+        description: "Payment references for this Purchase"
+        items:
+          type: "string"
+    title: "CompleteMarketplacePurchaseRequest"
+  CreateMarketplacePurchaseDistributionRequest:
+    type: "object"
+    required:
+      - "amount"
+      - "marketplaceCommission"
+    properties:
+      amount:
+        description: "Money amount for specified Seller"
+        $ref: "#/definitions/Money"
+      externalSellerId:
+        type: "string"
+        description: "External Id of Marketplace Seller"
+        minLength: 1
+        maxLength: 255
+      marketplaceCommission:
+        description: "Commission amount for specified Marketplace"
+        $ref: "#/definitions/Money"
+      sellerId:
+        type: "string"
+        description: "Id of Marketplace Seller"
+        minLength: 1
+        maxLength: 24
+    title: "CreateMarketplacePurchaseDistributionRequest"
+  CreateMarketplacePurchaseRequest:
+    type: "object"
+    required:
+      - "amount"
+      - "marketplaceId"
+      - "purchaseType"
+    properties:
+      amount:
+        description: "Total money amount of this Purchase"
+        $ref: "#/definitions/Money"
+      buyerCountryCode:
+        type: "string"
+        description: |
+          Country code of buyer.
+          Mandatory for Regular purchase.
+        minLength: 2
+        maxLength: 2
+        example: "DE"
+      description:
+        type: "string"
+        description: "Short description"
+        minLength: 1
+        maxLength: 255
+      distributions:
+        type: "array"
+        description: "Distribution of money amounts between beneficiaries"
+        items:
+          $ref: "#/definitions/CreateMarketplacePurchaseDistributionRequest"
+      externalPurchaseId:
+        type: "string"
+        description: "External Id of this Marketplace Purchase"
+        minLength: 1
+        maxLength: 64
+      marketplaceId:
+        type: "string"
+        description: "Marketplace Id of this Purchase"
+        minLength: 1
+        maxLength: 24
+      paymentReferences:
+        type: "array"
+        description: "Optional for a purchaseType=SettlementOnly, invalid for purchaseType=Regular"
+        items:
+          type: "string"
+      purchaseType:
+        type: "string"
+        description: "The Marketplace Purchase Type"
+        enum:
+          - "Regular"
+          - "SettlementOnly"
+    title: "CreateMarketplacePurchaseRequest"
+  CardPaymentDetails:
+    title: "CardPaymentDetails"
+    allOf:
+      - $ref: "#/definitions/PaymentSessionDetails"
+      - type: "object"
+        required:
+          - "selectedPaymentMethod"
+          - "selectedPaymentInstrumentId"
+        discriminator: "selectedPaymentMethod"
+        properties:
+          owner:
+            type: "string"
+            description: "The owner of the card. Only expected with preauthorization."
+          token:
+            type: "string"
+            description: |
+              The token typically generated/returned from PSP. Only expected with `preauthorization`.
+              If `preauthorization`, this field is used to populate from the PSP `prenotificationid`
+        title: "CardPaymentDetails"
+        description: |
+          Provide discriminator in mandatory field `selectedPaymentMethod` of
+           values `bankTransfer` or `cardPayment` as a string
+    description: |
+      Provide discriminator in mandatory field `selectedPaymentMethod` of
+        values `bankTransfer` or `cardPayment` as a string
+  ErrorDetails:
+    type: "object"
+    properties:
+      errorNumber:
+        type: "integer"
+        format: "int32"
+      field:
+        type: "string"
+      message:
+        type: "string"
+      reason:
+        type: "string"
+    title: "ErrorDetails"
+  MarketplacePaymentDistributionInfo:
+    type: "object"
+    properties:
+      amount:
+        description: "The money for the Seller share. The monetary amount should be parsed as a decimal"
+        $ref: "#/definitions/Money"
+      externalSellerId:
+        type: "string"
+        description: "The Marketplace External Seller ID"
+        minLength: 1
+        maxLength: 255
+      marketplaceCommission:
+        description: "The money for the Marketplace Commission share. The monetary amount should be parsed as a decimal"
+        $ref: "#/definitions/Money"
+      sellerId:
+        type: "string"
+        description: "The Marketplace Seller ID"
+        minLength: 1
+        maxLength: 24
+    title: "MarketplacePaymentDistributionInfo"
+  MarketplacePaymentInfo:
+    type: "object"
+    properties:
+      amount:
+        description: "The monetary amount should be parsed as a decimal"
+        $ref: "#/definitions/Money"
+      cancellationReason:
+        description: "The Marketplace Payment Cancellation Reason"
+        minLength: 1
+        maxLength: 255
+        type: "string"
+      creationDateTime:
+        type: "string"
+        format: "date-time"
+        description: "The creation date time of the Marketplace payment"
+        example: "2021-07-06T20:55:21Z"
+      id:
+        type: "string"
+        description: "The Marketplace Payment Id"
+        minLength: 1
+        maxLength: 24
+      marketplacePaymentDistributionInfoSet:
+        type: "array"
+        description: "Payment distributions"
+        items:
+          $ref: "#/definitions/MarketplacePaymentDistributionInfo"
+      marketplacePaymentRefundInfo:
+        description: "Refund details associated with the payment if the payment is for a Refund"
+        $ref: "#/definitions/MarketplacePaymentRefundInfo"
+      marketplacePaymentStatus:
+        description: "The Marketplace Payment Status"
+        type: "string"
+        enum:
+          - "Created"
+          - "Pending"
+          - "Cancelled"
+          - "Success"
+          - "Failure"
+      marketplacePaymentType:
+        description: "The Marketplace Payment Type"
+        type: "string"
+        enum:
+          - "Preauthorization"
+          - "Authorization"
+          - "Capture"
+          - "Cancellation"
+          - "Refund"
+          - "Chargeback"
+      marketplacePurchase:
+        description: "Purchase details associated with the payment"
+        $ref: "#/definitions/MarketplacePurchaseInfo"
+      paymentCategoryCode:
+        type: "integer"
+        format: "int32"
+        description: "The payment category code"
+      paymentContext:
+        type: "string"
+        description: "The Payment Context"
+        minLength: 1
+        maxLength: 64
+      paymentInstrument:
+        $ref: "#/definitions/PaymentInstrumentInfo"
+      paymentMethod:
+        type: "string"
+        description: "The payment method used for the payment"
+        enum:
+          - "bankTransfer"
+          - "cardPayment"
+      paymentTransactionId:
+        type: "string"
+        description: "Each processed Payment has a Payment Transaction Id"
+        minLength: 1
+        maxLength: 24
+      reconciledAmount:
+        description: "The monetary amount should be parsed as a decimal"
+        $ref: "#/definitions/Money"
+      reconciliationStatus:
+        description: "The Marketplace Reconciliation Status"
+        type: "string"
+        enum:
+          - "Success"
+          - "Failure"
+          - "Pending"
+          - "Error"
+          - "Underpaid"
+          - "Overpaid"
+      referencedPaymentId:
+        description: "The Marketplace Referenced Payment Id"
+        minLength: 1
+        maxLength: 24
+        type: "string"
+      virtualAccountId:
+        type: "string"
+        minLength: 1
+        maxLength: 50
+    title: "MarketplacePaymentInfo"
+  MarketplacePaymentRefundInfo:
+    type: "object"
+    properties:
+      externalRefundId:
+        description: "The Marketplace External Refund Id"
+        type: "string"
+        minLength: 1
+        maxLength: 64
+      refundReason:
+        description: "Refund Reason"
+        minLength: 1
+        maxLength: 200
+        type: "string"
+      refundReference:
+        description: "Refund Reference"
+        minLength: 1
+        maxLength: 200
+        type: "string"
+    title: "MarketplacePaymentRefundInfo"
+  MarketplacePurchaseCheckoutInfo:
+    type: "object"
+    properties:
+      marketplacePurchase:
+        description: "The Marketplace Purchase Info"
+        $ref: "#/definitions/MarketplacePurchaseInfo"
+      paymentId:
+        description: "The Marketplace Payment Id"
+        minLength: 1
+        maxLength: 24
+        type: "string"
+      paymentMethodDetails:
+        description: "The Marketplace Purchase Method Details Ex Info"
+        $ref: "#/definitions/PaymentMethodDetailsExInfo"
+      redirectRequired:
+        description: "The Redirect Required Info"
+        $ref: "#/definitions/RedirectRequiredInfo"
+    title: "MarketplacePurchaseCheckoutInfo"
+  MarketplacePurchaseDistributionInfo:
+    type: "object"
+    properties:
+      amount:
+        description: "The money for the Seller share. The monetary amount should be parsed as a decimal"
+        $ref: "#/definitions/Money"
+      externalSellerId:
+        description: "The Marketplace External Seller ID"
+        type: "string"
+        minLength: 1
+        maxLength: 255
+      marketplaceCommission:
+        description: "The money for the Marketplace Commission share. The monetary amount should be parsed as a decimal"
+        $ref: "#/definitions/Money"
+      sellerId:
+        description: "The Marketplace Seller ID"
+        type: "string"
+        minLength: 1
+        maxLength: 24
+    title: "MarketplacePurchaseDistributionInfo"
+  MarketplacePurchaseInfo:
+    type: "object"
+    properties:
+      amount:
+        description: "The monetary amount should be parsed as a decimal"
+        $ref: "#/definitions/Money"
+      cancellationReason:
+        type: "string"
+        description: "The Reason for cancellation"
+        minLength: 1
+        maxLength: 200
+      creationDateTime:
+        type: "string"
+        description: "The Creation date time of Marketplace Purchase"
+        format: "date-time"
+        example: "2021-07-06T20:55:21Z"
+      description:
+        type: "string"
+        description: "The Description given for the Marketplace Purchase Creation"
+        minLength: 0
+        maxLength: 255
+      distributions:
+        type: "array"
+        description: "Distribution of money amount between sellers"
+        items:
+          $ref: "#/definitions/MarketplacePurchaseDistributionInfo"
+      externalPurchaseId:
+        type: "string"
+        description: "The Marketplace Purchase External ID"
+        minLength: 1
+        maxLength: 64
+      id:
+        type: "string"
+        description: "The Marketplace Purchase Id"
+        minLength: 1
+        maxLength: 24
+      marketplaceId:
+        type: "string"
+        description: "The Marketplace ID for which the Purchase is created"
+        minLength: 1
+        maxLength: 24
+      marketplacePayments:
+        type: "array"
+        description: "Payments made for the MarketplacePurchase"
+        items:
+          $ref: "#/definitions/MarketplacePaymentInfo"
+      paymentReferences:
+        type: "array"
+        description: "Payment references of the MarketplacePurchase"
+        items:
+          type: "string"
+      purchaseStatus:
+        type: "string"
+        description: "The status of the Marketplace Purchase"
+        enum:
+          - "Created"
+          - "CheckoutInProgress"
+          - "ConfirmInProgress"
+          - "PreauthorizeInProgress"
+          - "Confirmed"
+          - "Cancelled"
+          - "Completed"
+      purchaseType:
+        type: "string"
+        example: "1: Regular 2: Settlement_Only"
+        description: "The type of the MarketplacePurchase"
+      reconciliationStatus:
+        type: "string"
+        enum:
+          - "Success"
+          - "Failure"
+          - "Pending"
+          - "Error"
+          - "Underpaid"
+          - "Overpaid"
+    title: "MarketplacePurchaseInfo"
+  Money:
+    type: "object"
+    description: "Adheres to ISO-4217"
+    properties:
+      amount:
+        type: "number"
+      currency:
+        type: "string"
+    example:
+      1:
+        amount: 99.99
+        currency: "EUR"
+      2:
+        amount: 99.00
+        currency: "USD"
+    title: "Money"
+  PagingResponse:
+    type: "object"
+    properties:
+      currentItemCount:
+        type: "integer"
+        format: "int32"
+      itemsPerPage:
+        type: "integer"
+        format: "int32"
+      pageIndex:
+        type: "integer"
+        format: "int32"
+      showNext:
+        type: "boolean"
+      showPrevious:
+        type: "boolean"
+      startIndex:
+        type: "integer"
+        format: "int32"
+      totalItems:
+        type: "integer"
+        format: "int32"
+      totalPages:
+        type: "integer"
+        format: "int32"
+    title: "PagingResponse"
+  PaymentInstrumentInfo:
+    type: "object"
+    properties:
+      additionalData:
+        type: "string"
+      creationDateTime:
+        type: "string"
+        format: "date-time"
+      currencyCode:
+        type: "string"
+      customType:
+        type: "string"
+      displayValue:
+        type: "string"
+      internalAdditionalData:
+        type: "string"
+      paymentInstrumentCapabilities:
+        type: "array"
+        items:
+          type: "string"
+          enum:
+            - "OfflineCredit"
+            - "OnlineCredit"
+            - "OfflineDebit"
+            - "OnlineDebit"
+      paymentInstrumentId:
+        type: "string"
+      paymentInstrumentPublicId:
+        type: "string"
+      paymentInstrumentStatus:
+        type: "string"
+      paymentInstrumentType:
+        type: "string"
+        enum:
+          - "CreditCard"
+          - "BankAccount"
+          - "CryptoWallet"
+          - "ExternalAccount"
+      paymentInstrumentVerificationStatus:
+        type: "string"
+        enum:
+          - "Unverified"
+          - "Unverifiable"
+          - "Verified"
+      preferred:
+        type: "boolean"
+      publicPaymentInstrumentInfo:
+        $ref: "#/definitions/PublicPaymentInstrumentInfo"
+      searchValue:
+        type: "string"
+      userAlias:
+        type: "string"
+      walletId:
+        type: "string"
+    title: "PaymentInstrumentInfo"
+  PaymentMethodDataInfo:
+    type: "object"
+    properties:
+      name:
+        type: "string"
+    title: "PaymentMethodDataInfo"
+  PaymentMethodDetailsExInfo:
+    type: "object"
+    properties:
+      action:
+        type: "string"
+        enum:
+          - "None"
+          - "ShowError"
+          - "AttemptPaid"
+          - "ThreeDSecure"
+          - "NeedCompleteCreditCardData"
+          - "OTP"
+          - "WaitForPaymentExecution"
+          - "UnknownPaymentResult"
+      merchantData:
+        type: "string"
+      paReq:
+        type: "string"
+      paymentMethods:
+        type: "array"
+        items:
+          $ref: "#/definitions/PaymentMethodDataInfo"
+      threeDSRedirectUrl:
+        type: "string"
+      threeDSadditionalData:
+        type: "string"
+    title: "PaymentMethodDetailsExInfo"
+  PaymentOptionsInfo:
+    type: "object"
+    properties:
+      paymentAmount:
+        description: "The Payment Amount"
+        $ref: "#/definitions/Money"
+      paymentMethodDetails:
+        $ref: "#/definitions/PaymentMethodDetailsExInfo"
+      purchaseId:
+        type: "string"
+        description: "The Purchase ID"
+        minLength: 1
+        maxLength: 24
+      walletId:
+        type: "string"
+        description: "The Wallet ID"
+        minLength: 1
+        maxLength: 24
+    title: "PaymentOptionsInfo"
+  PaymentSessionDetails:
+    type: "object"
+    required:
+      - "selectedPaymentMethod"
+      - "selectedPaymentInstrumentId"
+    discriminator: "selectedPaymentMethod"
+    properties:
+      selectedPaymentInstrumentId:
+        type: "string"
+        enum:
+          - "NEW"
+      selectedPaymentMethod:
+        type: "string"
+        enum:
+          - "bankTransfer"
+          - "cardPayment"
+    title: "PaymentSessionDetails"
+    description: |
+      Provide discriminator in mandatory field `selectedPaymentMethod` of
+        values `bankTransfer` or `cardPayment` as a string
+  PreauthorizeMarketplacePurchaseRequest:
+    type: "object"
+    required:
+      - "paymentSessionDetails"
+    properties:
+      paymentSessionDetails:
+        $ref: "#/definitions/PaymentSessionDetails"
+    example:
+      paymentSessionDetails (as BankTransferDetails):
+        selectedPaymentMethod: "bankTransfer"
+        selectedPaymentInstrumentId: "NEW"
+        additionalData: "PAYREF123O"
+        countryCode: "DE"
+      paymentSessionDetails (as CardPaymentDetails):
+        selectedPaymentMethod: "cardPayment"
+        selectedPaymentInstrumentId: "NEW"
+        owner: "Alice Bob"
+        token: "eyJ0IjoiSFcyaXFjNWxwWkZEcGZ0WEgtd3Ewdz09IiwicyI6ImliMXVRVlRFaU1UcTJMZ3UybzFRMHEifQ=="
+    title: "PreauthorizeMarketplacePurchaseRequest"
+  PublicPaymentInstrumentInfo:
+    type: "object"
+    properties:
+      owner:
+        type: "string"
+    title: "PublicPaymentInstrumentInfo"
+  RedirectRequiredInfo:
+    type: "object"
+    properties:
+      redirectMethod:
+        type: "string"
+        enum:
+          - "IFrameGet"
+          - "IFramePost"
+          - "TopFrameGet"
+          - "TopFramePost"
+      redirectReference:
+        type: "string"
+      redirectUrl:
+        type: "string"
+      requestParameters:
+        type: "object"
+        properties:
+          clientSession:
+            type: "string"
+            "description": |
+              Required for integration with javascript from PSP, but not required for API intergration to PSP
+          clientConfiguration:
+            type: "string"
+            "description": |
+              Required for integration with javascript from PSP, but not required for API intergration to PSP
+    title: "RedirectRequiredInfo"
+  RefundMarketplacePurchaseRequest:
+    type: "object"
+    required:
+      - "amount"
+      - "externalRefundId"
+      - "refundReference"
+      - "refundReason"
+    properties:
+      amount:
+        description: "Total money amount of this refund"
+        $ref: "#/definitions/Money"
+      distributions:
+        type: "array"
+        description: "Distribution of money amount between sellers"
+        items:
+          $ref: "#/definitions/CreateMarketplacePurchaseDistributionRequest"
+      externalRefundId:
+        type: "string"
+        description: "Refund External ID"
+        minLength: 1
+        maxLength: 64
+      refundReason:
+        type: "string"
+        description: "Refund initiation reason"
+        minLength: 1
+        maxLength: 200
+      refundReference:
+        type: "string"
+        description: "Refund reference"
+        minLength: 1
+        maxLength: 200
+      useLiquidity:
+        type: "boolean"
+        description: |
+          Whether Marketplace Liquidity account should be used for additional
+          funds, if necessary to complete refund. Default set to false.
+    title: "RefundMarketplacePurchaseRequest"
+  UpdateMarketplacePurchaseRequest:
+    type: "object"
+    properties:
+      amount:
+        description: "Total money amount of this Purchase"
+        $ref: "#/definitions/Money"
+      distributions:
+        type: "array"
+        description: "Distribution of money amount between sellers"
+        items:
+          $ref: "#/definitions/CreateMarketplacePurchaseDistributionRequest"
+    title: "UpdateMarketplacePurchaseRequest"
